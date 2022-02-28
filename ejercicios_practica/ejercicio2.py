@@ -7,10 +7,47 @@
 # IMPORTANTE: NO borrar los comentarios
 # que aparecen en verde con el hashtag "#"
 
+from http.client import responses
 import json
+from weakref import finalize
 import requests
-
 import matplotlib.pyplot as plt
+
+
+def extraer_info(url):
+    response = requests.get(url)
+    data = response.json()
+    return data
+
+def contar_titulos(datos):
+    cant_titulos = {}
+    for fila in datos:
+        usuario = fila.get('userId')
+
+        if usuario not in cant_titulos and fila.get('completed') == True:
+            finalizado = 0
+            finalizado += 1
+            cant_titulos[usuario] = finalizado
+        elif fila.get('completed') == True:
+            finalizado += 1
+            cant_titulos[usuario] = finalizado
+
+    return cant_titulos
+
+def graficar(cantidad_titulos):
+    usuarios = cantidad_titulos.keys()  #guardo en usuarios las keys del diccionario cantidad_titulos
+    titulos = cantidad_titulos.values() #guardo en titulos los values del diccionario cantidad_titulos
+    
+    fig = plt.figure()
+    fig.suptitle('Titulos de los Usuarios', fontsize=14)
+    ax = fig.add_subplot()
+
+    ax.bar(usuarios, titulos, color='green')
+    ax.set_facecolor('whitesmoke')
+    ax.set_xlabel('usuarios')
+    ax.set_ylabel('titulos')
+
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -18,6 +55,9 @@ if __name__ == '__main__':
     
     # Ejercicio de consumo de datos por API
     url = "https://jsonplaceholder.typicode.com/todos"
+    datos = extraer_info(url)
+    cantidad_titulos = contar_titulos(datos)
+    graficar(cantidad_titulos)
 
     # El primer paso es que copien esa URL en su explorador web
     # y analicen los datos en general:
@@ -45,5 +85,5 @@ if __name__ == '__main__':
     # para imprimir cuantos títulos completó cada usuario
     # y verifique si los primeros usuarios (mirando la página a ojo)
     # los datos recolectados son correctos.
-
+          
     print("terminamos")
